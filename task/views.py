@@ -12,8 +12,8 @@ def task_list(request):
             return redirect('task_list')
     return render(request, 'task/task_list.html', {'tasks': tasks, 'form': form})
 
-def task_delete(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
+def task_delete(request, pk):
+    task = get_object_or_404(Task, id=pk)
     task.delete()
     return redirect('task_list')
 

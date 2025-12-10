@@ -1,8 +1,62 @@
-<h2>{{ action }} Task</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{{ action }}</button>
-</form>
-<a href="{% url 'task_list' %}">Back to Task List</a>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Task Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Task Details</h2>
+        <span class="badge {% if task.completed %}bg-success{% else %}bg-warning text-dark{% endif %}">
+            {% if task.completed %}Completed{% else %}Pending{% endif %}
+        </span>
+    </div>
+
+    <!-- Task Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">{{ task.title }}</h4>
+            <p class="card-text">{{ task.description|default:"No description provided." }}</p>
+            <p class="card-text">
+                <small class="text-muted">Created at: {{ task.created_at|date:"F j, Y, g:i a" }}</small>
+            </p>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="mb-4">
+        <h4>Comments</h4>
+        <ul class="list-group">
+            {% for comment in task.comments.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                        {{ comment.content }}
+                        <br>
+                        <small class="text-muted">Posted at {{ comment.created_at|date:"M j, Y, g:i a" }}</small>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item text-muted">No comments yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Add Comment Form -->
+    <div class="mb-4">
+        <h5>Add a Comment</h5>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Comment</button>
+        </form>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary">Back to Task List</a>
+        {% if not task.completed %}
+            <a href="{% url 'task_complete' task.id %}" class="btn btn-success">Mark as Completed</a>
+        {% endif %}
+        <a href="{% url 'task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
+    </div>
+</div>
+{% endblock %}
 
